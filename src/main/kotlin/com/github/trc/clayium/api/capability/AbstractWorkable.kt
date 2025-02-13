@@ -23,7 +23,6 @@ import net.minecraft.util.EnumFacing
 import net.minecraft.world.World
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.fml.common.Optional
-import org.jetbrains.annotations.MustBeInvokedByOverriders
 import kotlin.math.round
 
 //todo cleanup
@@ -65,7 +64,7 @@ abstract class AbstractWorkable(
      * Show recipes in JEI.
      * Not called if Jei isn't loaded.
      */
-    protected abstract fun showRecipesInJei()
+    protected open fun showRecipesInJei() {}
 
     protected open fun getTier(): Int = metaTileEntity.tier.numeric
 
@@ -186,7 +185,7 @@ abstract class AbstractWorkable(
         return widget
     }
 
-    fun getNormalizedProgress(): Double {
+    open fun getNormalizedProgress(): Double {
         if (currentProgress == 0L || requiredProgress == 0L) return 0.0
         return (currentProgress.toDouble() - 1.0) / requiredProgress.toDouble()
     }
@@ -200,7 +199,6 @@ abstract class AbstractWorkable(
     }
 
     @Optional.Method(modid = Mods.Names.THE_ONE_PROBE)
-    @MustBeInvokedByOverriders
     /**
      * must be annotated with `@Optional.Method(modid = Mods.Names.THE_ONE_PROBE)`
      */
