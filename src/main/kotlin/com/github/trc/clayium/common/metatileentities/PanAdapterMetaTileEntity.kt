@@ -30,10 +30,7 @@ import com.github.trc.clayium.api.metatileentity.MetaTileEntity
 import com.github.trc.clayium.api.pan.IPanAdapter
 import com.github.trc.clayium.api.pan.IPanCable
 import com.github.trc.clayium.api.pan.IPanRecipe
-import com.github.trc.clayium.api.util.CUtils
-import com.github.trc.clayium.api.util.ITier
-import com.github.trc.clayium.api.util.clayiumId
-import com.github.trc.clayium.api.util.toList
+import com.github.trc.clayium.api.util.*
 import com.github.trc.clayium.client.model.ModelTextures
 import com.github.trc.clayium.common.gui.ClayGuiTextures
 import com.google.common.collect.ImmutableSet
@@ -90,7 +87,9 @@ class PanAdapterMetaTileEntity(
         for (i in 0..<laserInventory.slots) {
             val stack = laserInventory.getStackInSlot(i)
             val laserMte = (CUtils.getMetaTileEntity(stack) as? ClayLaserMetaTileEntity)  ?: continue
-            val laser = laserMte.laserManager.irradiatingLaser ?: continue
+            // Using White Laser is meaningless in terms of reducing energy cost
+            if (laserMte.tier == ClayTiers.ANTIMATTER) continue
+            val laser = laserMte.laserManager.sampleLaser
             val laserCostPerTick = laserMte.energyCost
             laserRgb[0] += (laser.red * stack.count)
             laserRgb[1] += (laser.green * stack.count)
@@ -102,6 +101,13 @@ class PanAdapterMetaTileEntity(
 
     override fun createMetaTileEntity(): MetaTileEntity {
         return PanAdapterMetaTileEntity(metaTileEntityId, tier)
+    }
+
+    override fun update() {
+        super.update()
+        if (offsetTimer % 20 == 0L) {
+            refreshEntries()
+        }
     }
 
     override fun <T> getCapability(capability: Capability<T>, facing: EnumFacing?): T? {
@@ -166,6 +172,7 @@ class PanAdapterMetaTileEntity(
         recipeInventories.forEachIndexed { i, h ->
             CUtils.writeItems(h, "panAdapterPattern$i", data)
         }
+        CUtils.writeItems(laserInventory, "laserInventory", data)
     }
 
     override fun readFromNBT(data: NBTTagCompound) {
@@ -173,6 +180,7 @@ class PanAdapterMetaTileEntity(
         recipeInventories.forEachIndexed { i, h ->
             CUtils.readItems(h, "panAdapterPattern$i", data)
         }
+        CUtils.readItems(laserInventory, "laserInventory", data)
     }
 
     override fun onFirstTick() {
