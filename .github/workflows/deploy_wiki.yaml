@@ -5,6 +5,7 @@ on:
     branches:
       - develop
     paths:
+      - '.github/workflows/deploy_wiki.yaml'
       - 'wiki/**'
   workflow_dispatch:
 
@@ -17,8 +18,14 @@ concurrency:
   group: pages
   cancel-in-progress: false
 
+defaults:
+  run:
+    working-directory:
+      wiki
+
 jobs:
   # Build job
+
   build:
     runs-on: ubuntu-latest
     steps:
@@ -30,11 +37,13 @@ jobs:
         uses: pnpm/action-setup@v3
         with:
           version: 9
+          package_json_file: 'wiki/package.json'
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
+          cache-dependency-path: 'wiki/pnpm-lock.yaml'
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Install dependencies
