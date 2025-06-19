@@ -12,6 +12,7 @@ import com.github.trc.clayium.api.capability.impl.ClayEnergyHolder
 import com.github.trc.clayium.api.capability.impl.ItemHandlerProxy
 import com.github.trc.clayium.api.capability.impl.NotifiableItemStackHandler
 import com.github.trc.clayium.api.metatileentity.MetaTileEntity
+import com.github.trc.clayium.api.metatileentity.MteRenderingConfig
 import com.github.trc.clayium.api.metatileentity.trait.AutoIoHandler
 import com.github.trc.clayium.api.pan.IPan
 import com.github.trc.clayium.api.pan.IPanCable
@@ -64,8 +65,6 @@ class PanDuplicatorMetaTileEntity(
     private val machineHullTier: ITier = ClayTiers.entries[duplicatorRank + 3]
 ) : MetaTileEntity(metaTileEntityId, tier, validInputModesLists[2], validOutputModesLists[1], "pan_duplicator"), IPanUser {
 
-    override val faceTexture = clayiumId("blocks/pan_duplicator")
-
     val maxCeConsumptionRate = ClayEnergy(10_000 * 10.0.pow(duplicatorRank - 1).toLong())
 
     private val antimatterSlot = NotifiableItemStackHandler(this, 1, this, isExport = false)
@@ -96,8 +95,8 @@ class PanDuplicatorMetaTileEntity(
         }
     }
 
-    override fun clearMachineInventory(itemBuffer: MutableList<ItemStack>) {
-        super.clearMachineInventory(itemBuffer)
+    override fun itemsDroppedOnDestroy(itemBuffer: MutableList<ItemStack>) {
+        super.itemsDroppedOnDestroy(itemBuffer)
         clearInventory(itemBuffer, clayEnergyHolder.energizedClayItemHandler)
     }
 
@@ -160,10 +159,13 @@ class PanDuplicatorMetaTileEntity(
         panCasingQuads = EnumFacing.entries.map { ModelTextures.createQuad(it, sprite) }
     }
 
-    override fun getQuads(quads: MutableList<BakedQuad>, state: IBlockState?, side: EnumFacing?, rand: Long) {
+    override fun overlayQuads(quads: MutableList<BakedQuad>, state: IBlockState?, side: EnumFacing?, rand: Long) {
         if (state == null || side == null || state !is IExtendedBlockState) return
-        quads.add(ModelTextures.getHullQuads(this.machineHullTier)?.get(side) ?: return)
         if (side != this.frontFacing) quads.add(panCasingQuads[side.index])
+    }
+
+    override val renderingConfig by lazy {
+        MteRenderingConfig.face(clayiumId("blocks/pan_duplicator"))
     }
 
     private inner class PanDuplicatorRecipeLogic : AbstractWorkable(this@PanDuplicatorMetaTileEntity) {
@@ -241,5 +243,3 @@ class PanDuplicatorMetaTileEntity(
 private const val COLOR_ENABLED_ARGB: Int = 0xFF4CBB17.toInt()
 private const val COLOR_DISABLED_ARGB: Int = 0xFFBB1C28.toInt()
 private const val BORDER_COLOR: Int = 0xFF555555.toInt()
-private const val HALF_HOUR_TICKS: Int = 30 * 60 * 20
-private const val ONE_MIN_TICKS: Double = 60 * 20.0

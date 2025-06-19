@@ -50,7 +50,6 @@ class MultiTrackBufferMetaTileEntity(
     validInputModes = mBufferValidIoModes[getTrackRows(tier.numeric)-2], validOutputModes = mBufferValidIoModes[getTrackRows(tier.numeric)-2],
     "multi_track_buffer") {
 
-    override val hasFrontFacing: Boolean = true
     override val pipeConnectionLogic: IPipeConnectionLogic = IPipeConnectionLogic.ItemPipe
 
     val trackRow = getTrackRows(tier.numeric)
@@ -74,8 +73,7 @@ class MultiTrackBufferMetaTileEntity(
             val filterStack = filtersHandler.getStackInSlot(slot)
             val filter = filterStack.getCapability(ClayiumCapabilities.ITEM_FILTER, null)
             if (filterStack.isEmpty) true
-            else if (filter != null) filter.test(stack)
-            else filterStack.isItemEqual(stack)
+            else filter?.test(stack) ?: filterStack.isItemEqual(stack)
         }
     }
     override val itemInventory = CombinedInvWrapper(*tracks)
@@ -165,7 +163,7 @@ class MultiTrackBufferMetaTileEntity(
             for (side in EnumFacing.entries) {
                 if (!(remaining > 0 && isImporting(side))) continue
 
-                val neighbor = getNeighbor(side) ?: continue
+                val neighbor = getNeighborTileEntity(side) ?: continue
                 if (neighbor is MetaTileEntityHolder && neighbor.metaTileEntity is MultiTrackBufferMetaTileEntity) {
                     val neighborBuffer = neighbor.metaTileEntity as MultiTrackBufferMetaTileEntity
                     remaining = transferMultiTrack(neighborBuffer, this@MultiTrackBufferMetaTileEntity, remaining)
@@ -184,7 +182,7 @@ class MultiTrackBufferMetaTileEntity(
             for (side in EnumFacing.entries) {
                 if (!(remaining > 0 && isExporting(side))) continue
 
-                val neighbor = getNeighbor(side) ?: continue
+                val neighbor = getNeighborTileEntity(side) ?: continue
                 if (neighbor is MetaTileEntityHolder && neighbor.metaTileEntity is MultiTrackBufferMetaTileEntity) {
                     val neighborBuffer = neighbor.metaTileEntity as MultiTrackBufferMetaTileEntity
                     remaining = transferMultiTrack(this@MultiTrackBufferMetaTileEntity, neighborBuffer, remaining)
@@ -238,5 +236,9 @@ class MultiTrackBufferMetaTileEntity(
             in 9..13 -> 6
             else -> 2
         }
+    }
+
+    override val renderingConfig by lazy {
+        MteRenderingConfig.builder().noFrontFacing().build()
     }
 }

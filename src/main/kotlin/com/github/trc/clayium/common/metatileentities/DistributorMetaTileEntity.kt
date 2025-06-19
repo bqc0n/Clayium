@@ -12,6 +12,7 @@ import com.github.trc.clayium.api.GUI_DEFAULT_WIDTH
 import com.github.trc.clayium.api.capability.impl.ClayiumItemStackHandler
 import com.github.trc.clayium.api.gui.data.MetaTileEntityGuiData
 import com.github.trc.clayium.api.metatileentity.MetaTileEntity
+import com.github.trc.clayium.api.metatileentity.MteRenderingConfig
 import com.github.trc.clayium.api.metatileentity.trait.AutoIoHandler
 import com.github.trc.clayium.api.util.ITier
 import com.github.trc.clayium.api.util.MachineIoMode
@@ -19,29 +20,20 @@ import com.github.trc.clayium.api.util.clayiumId
 import com.github.trc.clayium.api.util.copyWithSize
 import com.github.trc.clayium.api.util.enumMapNotNull
 import com.github.trc.clayium.api.util.next
-import com.github.trc.clayium.client.model.ModelTextures
 import com.github.trc.clayium.common.util.CNbtUtils
 import com.github.trc.clayium.integration.modularui.MuiSlots
-import net.minecraft.block.state.IBlockState
-import net.minecraft.client.renderer.block.model.BakedQuad
-import net.minecraft.client.renderer.block.model.FaceBakery
-import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 import net.minecraftforge.common.capabilities.Capability
-import net.minecraftforge.common.property.IExtendedBlockState
-import net.minecraftforge.fml.relauncher.Side
-import net.minecraftforge.fml.relauncher.SideOnly
 import net.minecraftforge.items.CapabilityItemHandler
 import net.minecraftforge.items.IItemHandler
 import net.minecraftforge.items.ItemHandlerHelper
 import net.minecraftforge.items.wrapper.CombinedInvWrapper
 import org.jetbrains.annotations.VisibleForTesting
 import java.util.*
-import java.util.function.Function
 import kotlin.math.min
 
 class DistributorMetaTileEntity(
@@ -127,17 +119,11 @@ class DistributorMetaTileEntity(
         return super.getCapability(capability, facing)
     }
 
-    @SideOnly(Side.CLIENT)
-    override fun bakeQuads(getter: Function<ResourceLocation, TextureAtlasSprite>, faceBakery: FaceBakery) {
-        val sprite = getter.apply(clayiumId("blocks/distributor"))
-        distributorQuads = EnumFacing.entries.map { ModelTextures.createQuad(it, sprite) }
-    }
-
-    @SideOnly(Side.CLIENT)
-    override fun getQuads(quads: MutableList<BakedQuad>, state: IBlockState?, side: EnumFacing?, rand: Long) {
-        super.getQuads(quads, state, side, rand)
-        if (state == null || side == null || state !is IExtendedBlockState) return
-        quads.add(distributorQuads[side.index])
+    override val renderingConfig by lazy {
+        MteRenderingConfig.builder()
+            .face(clayiumId("blocks/distributor"))
+            .useFaceForAllSides()
+            .build()
     }
 
     override fun onReplace(world: World, pos: BlockPos, newMetaTileEntity: MetaTileEntity, oldMteData: NBTTagCompound) {
@@ -192,7 +178,7 @@ class DistributorMetaTileEntity(
             for (side in EnumFacing.entries) {
                 if (!(remainingImport > 0 && isImporting(side))) continue
                 remainingImport = transferItemStack(
-                    from = metaTileEntity.getNeighbor(side)?.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side.opposite) ?: continue,
+                    from = metaTileEntity.getNeighborTileEntity(side)?.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side.opposite) ?: continue,
                     to = importItems,
                     amount = remainingImport,
                 )
@@ -203,9 +189,8 @@ class DistributorMetaTileEntity(
         override fun exportToNeighbors() {
             val neighborMap = EnumFacing.entries.enumMapNotNull { side ->
                 if (!isExporting(side)) return@enumMapNotNull null
-                getNeighbor(side)?.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side.opposite)
+                getNeighborTileEntity(side)?.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side.opposite)
             }
-            @Suppress("UsePropertyAccessSyntax") //synthetic properties
             if (neighborMap.isEmpty()) return
             val currentInv = groups[exportPtr]
 
@@ -247,12 +232,10 @@ class DistributorMetaTileEntity(
                     }
                 }
 
-                @Suppress("UsePropertyAccessSyntax") //synthetic properties
                 if (neighbors.isEmpty()) continue
 
                 // one by one insertion
                 val nextNeighbor: Iterator<EnumFacing> = generateSequence(lastDirection.next()) { current ->
-                    @Suppress("UsePropertyAccessSyntax") //synthetic properties
                     if (neighbors.isEmpty()) {
                         return@generateSequence null
                     }
@@ -283,9 +266,5 @@ class DistributorMetaTileEntity(
             }
             return remainingExport != amountPerAction
         }
-    }
-
-    companion object {
-        private lateinit var distributorQuads: List<BakedQuad>
     }
 }

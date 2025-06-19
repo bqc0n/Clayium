@@ -11,6 +11,7 @@ import com.github.trc.clayium.api.GUI_DEFAULT_WIDTH
 import com.github.trc.clayium.api.capability.impl.RecipeLogicEnergy
 import com.github.trc.clayium.api.gui.data.MetaTileEntityGuiData
 import com.github.trc.clayium.api.metatileentity.MetaTileEntity
+import com.github.trc.clayium.api.metatileentity.MteRenderingConfig
 import com.github.trc.clayium.api.metatileentity.WorkableMetaTileEntity
 import com.github.trc.clayium.api.metatileentity.trait.AutoIoHandler
 import com.github.trc.clayium.api.util.ITier
@@ -30,11 +31,11 @@ class CentrifugeMetaTileEntity(
     metaTileEntityId: ResourceLocation,
     tier: ITier,
     outputSize: Int,
-) : WorkableMetaTileEntity(metaTileEntityId, tier, validInputModesLists[1], validOutputModesLists[1], CRecipes.CENTRIFUGE, outputSize = outputSize) {
+) : WorkableMetaTileEntity(metaTileEntityId, tier, validInputModesLists[1], validOutputModesLists[1], CRecipes.CENTRIFUGE,
+    outputSize = outputSize) {
 
     @Suppress("Unused") private val ioHandler = AutoIoHandler.Combined(this)
 
-    override val faceTexture = clayiumId("blocks/centrifuge")
     override val workable = RecipeLogicEnergy(this, recipeRegistry, clayEnergyHolder)
         .setDurationMultiplier(ConfigTierBalance.crafting::getCraftTimeMultiplier)
         .setEnergyConsumingMultiplier(ConfigTierBalance.crafting::getConsumingEnergyMultiplier)
@@ -66,7 +67,7 @@ class CentrifugeMetaTileEntity(
 
         @Suppress("DuplicatedCode") // special output slot layout
         return ParentWidget().widthRel(1f).expanded().marginBottom(2)
-            .child(IKey.str(getStackForm().displayName).asWidget()
+            .child(IKey.str(asStackForm().displayName).asWidget()
                 .align(Alignment.TopLeft))
             .child(IKey.lang("container.inventory").asWidget().align(Alignment.BottomLeft))
             .child(IKey.dynamic {
@@ -85,5 +86,9 @@ class CentrifugeMetaTileEntity(
 
     override fun createMetaTileEntity(): MetaTileEntity {
         return CentrifugeMetaTileEntity(metaTileEntityId, tier, outputSize)
+    }
+
+    override val renderingConfig by lazy {
+        MteRenderingConfig.face(clayiumId("blocks/centrifuge"))
     }
 }

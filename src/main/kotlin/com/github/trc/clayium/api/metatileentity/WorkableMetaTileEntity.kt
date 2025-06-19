@@ -32,8 +32,9 @@ abstract class WorkableMetaTileEntity(
     val outputSize: Int = recipeRegistry.maxOutputs,
 ) : MetaTileEntity(metaTileEntityId, tier, validInputModes, validOutputModes, recipeRegistry.category.categoryName) {
 
-    constructor(metaTileEntityId: ResourceLocation, tier: ITier, recipeRegistry: RecipeRegistry<*>)
-            : this(metaTileEntityId, tier, validInputModesLists[recipeRegistry.maxInputs], validOutputModesLists[recipeRegistry.maxOutputs], recipeRegistry)
+    constructor(metaTileEntityId: ResourceLocation, tier: ITier, recipeRegistry: RecipeRegistry<*>) : this(
+        metaTileEntityId, tier, validInputModesLists[recipeRegistry.maxInputs],
+        validOutputModesLists[recipeRegistry.maxOutputs], recipeRegistry)
 
     override val importItems = NotifiableItemStackHandler(this, inputSize, this, false)
     override val exportItems = NotifiableItemStackHandler(this, outputSize, this, true)
@@ -50,8 +51,8 @@ abstract class WorkableMetaTileEntity(
         super.onPlacement()
     }
 
-    override fun clearMachineInventory(itemBuffer: MutableList<ItemStack>) {
-        super.clearMachineInventory(itemBuffer)
+    override fun itemsDroppedOnDestroy(itemBuffer: MutableList<ItemStack>) {
+        super.itemsDroppedOnDestroy(itemBuffer)
         clearInventory(itemBuffer, clayEnergyHolder.energizedClayItemHandler)
     }
 

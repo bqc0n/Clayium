@@ -13,6 +13,8 @@ import com.github.trc.clayium.api.capability.ClayiumDataCodecs.UPDATE_STORED_ITE
 import com.github.trc.clayium.api.capability.IPipeConnectionLogic
 import com.github.trc.clayium.api.capability.impl.ClayiumItemStackHandler
 import com.github.trc.clayium.api.metatileentity.MetaTileEntity
+import com.github.trc.clayium.api.metatileentity.MteRenderingConfig
+import com.github.trc.clayium.api.metatileentity.interfaces.IHasItemStackNbt
 import com.github.trc.clayium.api.metatileentity.trait.AutoIoHandler
 import com.github.trc.clayium.api.util.ITier
 import com.github.trc.clayium.api.util.clayiumId
@@ -57,15 +59,8 @@ class StorageContainerMetaTileEntity(
     metaTileEntityId: ResourceLocation,
     tier: ITier,
     isUpgraded: Boolean,
-) : MetaTileEntity(metaTileEntityId, tier, bufferValidInputModes, validOutputModesLists[1], "storage_container") {
-
-    override val faceTexture = clayiumId("blocks/storage_container")
-    override val requiredTextures get() = listOf(
-        faceTexture,
-        clayiumId("blocks/storage_container_side_composed"), clayiumId("blocks/storage_container_side_upgraded"),
-        clayiumId("blocks/storage_container_top_composed"), clayiumId("blocks/storage_container_top_upgraded"),
-        clayiumId("blocks/storage_container_upgraded_base")
-    )
+) : MetaTileEntity(metaTileEntityId, tier, bufferValidInputModes, validOutputModesLists[1], "storage_container"),
+    IHasItemStackNbt {
 
     override val pipeConnectionLogic: IPipeConnectionLogic = IPipeConnectionLogic.ItemPipe
 
@@ -118,7 +113,7 @@ class StorageContainerMetaTileEntity(
         }
     }
 
-    override fun onRightClick(player: EntityPlayer, hand: EnumHand, clickedSide: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean {
+    override fun onRightClickServerSide(player: EntityPlayer, hand: EnumHand, clickedSide: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean {
         val stack = player.getHeldItem(hand)
         val clayCore = MetaItemClayParts.ClayCore.getStackForm()
         //todo use capability
@@ -126,14 +121,14 @@ class StorageContainerMetaTileEntity(
             val world = this.world
             val pos = this.pos
             if (!(world == null || pos == null)) {
-                val upgradedStorageContainerStack = MetaTileEntities.STORAGE_CONTAINER_UPGRADED.getStackForm()
+                val upgradedStorageContainerStack = MetaTileEntities.STORAGE_CONTAINER_UPGRADED.asStackForm()
                 upgradedStorageContainerStack.tagCompound = NBTTagCompound().apply { writeItemStackNbt(this) }
                 this.blockMachine.onBlockPlacedBy(world, pos, world.getBlockState(pos), player, upgradedStorageContainerStack)
                 stack.shrink(1)
                 return true
             }
         }
-        return super.onRightClick(player, hand, clickedSide, hitX, hitY, hitZ)
+        return super.onRightClickServerSide(player, hand, clickedSide, hitX, hitY, hitZ)
     }
 
     override fun <T> getCapability(capability: Capability<T>, facing: EnumFacing?): T? {
@@ -228,7 +223,19 @@ class StorageContainerMetaTileEntity(
         writeCustomData(UPDATE_FILTER_ITEM) { writeCompoundTag(filterSlot.serializeNBT()) }
     }
 
-    override fun clearMachineInventory(itemBuffer: MutableList<ItemStack>) {}
+    override fun itemsDroppedOnDestroy(itemBuffer: MutableList<ItemStack>) {}
+
+    override val renderingConfig by lazy {
+        MteRenderingConfig.builder()
+            .face(clayiumId("blocks/storage_container"))
+            .addRequiredTextures(
+                clayiumId("blocks/storage_container_side_composed"), clayiumId("blocks/storage_container_side_upgraded"),
+                clayiumId("blocks/storage_container_top_composed"), clayiumId("blocks/storage_container_top_upgraded"),
+                clayiumId("blocks/storage_container_upgraded_base")
+            )
+            .build()
+
+    }
 
     @SideOnly(Side.CLIENT)
     override fun registerItemModel(item: Item, meta: Int) {
