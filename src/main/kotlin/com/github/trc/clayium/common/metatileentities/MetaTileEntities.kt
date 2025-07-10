@@ -242,6 +242,10 @@ object MetaTileEntities {
         RangedMinerMetaTileEntity(clayiumId("ranged_miner"), ClayTiers.ZK60A))
     val ADV_RANGED_MINER = registerMetaTileEntity(1003,
         AdvancedRangedMinerMetaTileEntity(clayiumId("adv_ranged_miner"), ClayTiers.ZK60A))
+    val ACTIVATOR = registerMetaTileEntity(1010,
+        ActivatorMetaTileEntity(clayiumId("activator"), ClayTiers.AZ91D, "activator"))
+    val RANGED_ACTIVATOR = registerMetaTileEntity(1011,
+        RangedActivatorMetaTileEntity(clayiumId("ranged_activator"), ClayTiers.ZK60A, "ranged_activator"))
 
     /**
      * @param tiers corresponding to the main material tiers (Clay, DenseClay...OPA)
