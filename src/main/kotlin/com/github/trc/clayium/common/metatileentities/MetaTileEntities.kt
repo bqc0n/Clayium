@@ -243,8 +243,11 @@ object MetaTileEntities {
         RangedMinerMetaTileEntity(clayiumId("ranged_miner"), ClayTier.zk60a(8)))
     val ADV_RANGED_MINER = registerMetaTileEntity(1003,
         AdvancedRangedMinerMetaTileEntity(clayiumId("adv_ranged_miner"), ClayTier.zk60a(9)))
+    // RANGED REPLACER
+    val ITEM_COLLECTOR = registerMetaTileEntity(1005,
+        ItemCollectorMetaTileEntity(clayiumId("item_collector"), ClayTier.zk60a(7)))
     val ACTIVATOR = registerMetaTileEntity(1010,
-        ActivatorMetaTileEntity(clayiumId("activator"), ClayTiers.AZ91D, "activator"))
+        ActivatorMetaTileEntity(clayiumId("activator"), ClayTiers.AZ91D, "activator", renderMinerBack = true))
     val RANGED_ACTIVATOR = registerMetaTileEntity(1011,
         RangedActivatorMetaTileEntity(clayiumId("ranged_activator"), ClayTier.zk60a(8), "ranged_activator"))
 

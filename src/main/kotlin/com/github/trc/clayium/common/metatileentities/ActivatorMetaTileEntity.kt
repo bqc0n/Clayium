@@ -17,6 +17,7 @@ import com.github.trc.clayium.api.metatileentity.MteRenderingConfig
 import com.github.trc.clayium.api.metatileentity.trait.AutoIoHandler
 import com.github.trc.clayium.api.util.CUtils
 import com.github.trc.clayium.api.util.ITier
+import com.github.trc.clayium.api.util.MachineIoMode
 import com.github.trc.clayium.api.util.clayiumId
 import com.github.trc.clayium.api.util.getCapability
 import com.github.trc.clayium.api.util.hasCapability
@@ -28,7 +29,6 @@ import com.github.trc.clayium.common.util.RayTraceMemory
 import com.github.trc.clayium.integration.modularui.MuiSlots
 import net.minecraft.block.Block
 import net.minecraft.block.state.IBlockState
-import net.minecraft.client.renderer.block.model.BakedQuad
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.InventoryPlayer
 import net.minecraft.item.ItemStack
@@ -43,14 +43,14 @@ import net.minecraft.util.math.RayTraceResult
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
 import net.minecraft.world.WorldServer
-import net.minecraftforge.common.property.IExtendedBlockState
 import net.minecraftforge.items.ItemHandlerHelper
 
 open class ActivatorMetaTileEntity(
     metaTileEntityId: ResourceLocation,
     tier: ITier,
     machineName: String,
-) : AbstractBuilderMetaTileEntity(metaTileEntityId, tier, machineName, bufferValidInputModes) {
+    renderMinerBack: Boolean,
+) : AbstractBuilderMetaTileEntity(metaTileEntityId, tier, machineName, bufferValidInputModes, renderMinerBack = renderMinerBack) {
 
     @Suppress("unused")
     val ioHandler = AutoIoHandler.Exporter(this)
@@ -64,7 +64,7 @@ open class ActivatorMetaTileEntity(
     protected val itemFilter: IItemFilter?
         get() = filtersHandler.getStackInSlot(1).getCapability(ClayiumCapabilities.ITEM_FILTER)
 
-    protected var blockEntityMode = BlockEntityMode.BLOCK
+    protected var blockEntityMode = BLOCK
     protected var enableRayTrace = false
     protected var sneaking = false
 
@@ -72,6 +72,17 @@ open class ActivatorMetaTileEntity(
     protected var allBlocksProcessed = false
 
     protected val scannedEntities = mutableSetOf<Entity>()
+
+    override fun onPlacement() {
+        if (this.frontFacing.axis == EnumFacing.Axis.Y) {
+            this.setInput(EnumFacing.SOUTH, MachineIoMode.ALL)
+        } else {
+            this.setInput(EnumFacing.UP, MachineIoMode.ALL)
+        }
+        super.onPlacement()
+    }
+
+    override fun isFacingValid(facing: EnumFacing) = true
 
     override fun drawEnergy(accelerationRate: Double): Boolean { return true }
 
@@ -202,7 +213,7 @@ open class ActivatorMetaTileEntity(
         // subtract eyeHeight because the player is "standing" on the block.
         // If you don't subtract eyeHeight, then it will be higher than this activator block's y coordinate.
         val playerY = from.y.toDouble() - player.eyeHeight
-        val playerPos = memory.entityRelPos.add(from.x.toDouble(), from.y.toDouble() - player.eyeHeight, from.z.toDouble())
+        val playerPos = memory.entityRelPos.add(from.x.toDouble(), playerY, from.z.toDouble())
         player.setWorld(world)
         player.setLocationAndAngles(playerPos.x, playerPos.y, playerPos.z, memory.yaw.toFloat(), memory.pitch.toFloat())
         player.isSneaking = sneaking
@@ -330,26 +341,18 @@ open class ActivatorMetaTileEntity(
 
     override fun readFromNBT(data: NBTTagCompound) {
         super.readFromNBT(data)
-        blockEntityMode = BlockEntityMode.entries.getOrElse(data.getInteger("blockEntityMode")) { BlockEntityMode.BLOCK }
+        blockEntityMode = BlockEntityMode.entries.getOrElse(data.getInteger("blockEntityMode")) { BLOCK }
         enableRayTrace = data.getBoolean("raytrace")
         sneaking = data.getBoolean("sneaking")
         isBlockForBlockAndEntityMode = data.getBoolean("isBlockForBlockAndEntityMode")
     }
 
     override fun createMetaTileEntity(): MetaTileEntity {
-        return ActivatorMetaTileEntity(metaTileEntityId, tier, "activator")
+        return ActivatorMetaTileEntity(metaTileEntityId, tier, "activator", renderMinerBack = true)
     }
 
     override val renderingConfig by lazy {
         MteRenderingConfig.face(clayiumId("blocks/activator"))
-    }
-
-    override fun overlayQuads(quads: MutableList<BakedQuad>, state: IBlockState?, side: EnumFacing?, rand: Long) {
-        super.overlayQuads(quads, state, side, rand)
-        if (state == null || side == null || state !is IExtendedBlockState) return
-        if (side == this.frontFacing.opposite) {
-            quads.add(MINER_BACK[side.index])
-        }
     }
 
     enum class BlockEntityMode {
