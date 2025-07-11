@@ -12,7 +12,6 @@
       enabled: false
     },
     {
-      matchCategories: ["gradle"],
       matchFileNames: ["dependencies.gradle"],
       enabled: true,
       groupName: "Gradle Dependencies"
