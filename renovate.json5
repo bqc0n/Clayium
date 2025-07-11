@@ -8,10 +8,11 @@
   addLabels: ["renovate"],
   packageRules: [
     {
-      matchFileNames: ["*"],
+      matchCategories: ["*"],
       enabled: false
     },
     {
+      matchCategories: ["gradle"],
       matchFileNames: ["dependencies.gradle"],
       enabled: true,
       groupName: "Gradle Dependencies"
