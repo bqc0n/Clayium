@@ -8,8 +8,8 @@
   addLabels: ["renovate"],
   packageRules: [
     {
-      matchFileNames: ["*"],
-      enabled: false
+      matchDepNames: ["*"],
+      enabled: false,
     },
     {
       matchFileNames: ["dependencies.gradle"],
@@ -17,14 +17,14 @@
       groupName: "Gradle Dependencies"
     },
     {
-      matchCategories: ["github-actions"],
+      matchCategories: ["ci"], // for GitHub Actions
       enabled: true,
       groupName: "GitHub Actions"
     },
     {
-      matchCategories: ["npm"],
+      matchCategories: ["js"], // for wiki
       enabled: true,
       groupName: "NPM Dependencies"
-    }
+    },
   ]
 }
