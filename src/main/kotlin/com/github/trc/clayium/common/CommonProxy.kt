@@ -22,8 +22,11 @@ import com.github.trc.clayium.common.blocks.chunkloader.ChunkLoaderTileEntity
 import com.github.trc.clayium.common.blocks.claycraftingtable.TileClayCraftingTable
 import com.github.trc.clayium.common.blocks.clayworktable.TileClayWorkTable
 import com.github.trc.clayium.common.blocks.marker.TileClayMarker
+import com.github.trc.clayium.common.blocks.metalchest.BlockMetalChest
+import com.github.trc.clayium.common.blocks.metalchest.TileEntityMetalChest
 import com.github.trc.clayium.common.creativetab.ClayiumCTabs
 import com.github.trc.clayium.common.items.ClayiumItems
+import com.github.trc.clayium.common.items.ItemBlockMetalChest
 import com.github.trc.clayium.common.items.ItemClaySteelPickaxe
 import com.github.trc.clayium.common.items.metaitem.MetaItemClayParts
 import com.github.trc.clayium.common.items.metaitem.MetaPrefixItem
@@ -75,6 +78,8 @@ open class CommonProxy {
         MetaTileEntities.init()
         CMaterials.init()
         OrePrefix.init()
+
+        BlockMetalChest.loadMetalChestConfig()
 
         GuiManager.registerFactory(MetaTileEntityGuiFactory)
 
@@ -199,6 +204,8 @@ open class CommonProxy {
 
         registry.register(createItemBlock(ClayiumBlocks.LASER_REFLECTOR, ::ItemBlockClayLaserReflector))
 
+        registry.register(createItemBlock(ClayiumBlocks.METAL_CHEST, ::ItemBlockMetalChest))
+
         for (block in ClayiumBlocks.ENERGIZED_CLAY_BLOCKS) {
             registry.register(createItemBlock(block) { ItemBlockEnergizedClay(it, OrePrefix.block) })
         }
@@ -237,5 +244,7 @@ open class CommonProxy {
         GameRegistry.registerTileEntity(TileClayMarker.AllHeight::class.java, clayiumId("clayMarkerAllHeight"))
 
         GameRegistry.registerTileEntity(ChunkLoaderTileEntity::class.java, clayiumId("chunkLoader"))
+
+        GameRegistry.registerTileEntity(TileEntityMetalChest::class.java, clayiumId("metalChest"))
     }
 }

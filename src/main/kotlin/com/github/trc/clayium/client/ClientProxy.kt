@@ -4,16 +4,17 @@ import codechicken.lib.colour.ColourRGBA
 import com.github.trc.clayium.api.metatileentity.MetaTileEntityHolder
 import com.github.trc.clayium.api.util.clayiumId
 import com.github.trc.clayium.client.gui.TextureExtra
-import com.github.trc.clayium.client.model.LaserReflectorModelLoader
 import com.github.trc.clayium.client.model.MetaTileEntityModelLoader
-import com.github.trc.clayium.client.model.MetalBlockModelLoader
+import com.github.trc.clayium.client.model.MetalModelLoader
 import com.github.trc.clayium.client.renderer.ClayLaserReflectorRenderer
 import com.github.trc.clayium.client.renderer.ClayMarkerTESR
 import com.github.trc.clayium.client.renderer.MetaTileEntityRenderDispatcher
+import com.github.trc.clayium.client.renderer.MetalChestRenderer
 import com.github.trc.clayium.common.CommonProxy
 import com.github.trc.clayium.common.blocks.ClayiumBlocks
 import com.github.trc.clayium.common.blocks.TileEntityClayLaserReflector
 import com.github.trc.clayium.common.blocks.marker.TileClayMarker
+import com.github.trc.clayium.common.blocks.metalchest.TileEntityMetalChest
 import com.github.trc.clayium.common.items.metaitem.MetaItemClayium
 import com.github.trc.clayium.common.metatileentities.MetaTileEntities
 import com.github.trc.clayium.common.util.KeyInput
@@ -43,12 +44,12 @@ class ClientProxy : CommonProxy() {
         MinecraftForge.EVENT_BUS.register(KeyInput)
 
         ModelLoaderRegistry.registerLoader(MetaTileEntityModelLoader)
-        ModelLoaderRegistry.registerLoader(LaserReflectorModelLoader)
-        ModelLoaderRegistry.registerLoader(MetalBlockModelLoader)
+        ModelLoaderRegistry.registerLoader(MetalModelLoader)
 
         ClientRegistry.bindTileEntitySpecialRenderer(MetaTileEntityHolder::class.java, MetaTileEntityRenderDispatcher)
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntityClayLaserReflector::class.java, ClayLaserReflectorRenderer)
         ClientRegistry.bindTileEntitySpecialRenderer(TileClayMarker.NoExtend::class.java, ClayMarkerTESR)
+        ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMetalChest::class.java, MetalChestRenderer)
 
         ClayiumBlocks.CLAY_TREE_LEAVES.setGraphicsLevel(Minecraft.getMinecraft().gameSettings.fancyGraphics)
     }

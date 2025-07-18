@@ -11,6 +11,7 @@ import com.github.trc.clayium.api.unification.material.CPropertyKey
 import com.github.trc.clayium.api.unification.ore.OrePrefix
 import com.github.trc.clayium.api.util.clayiumId
 import com.github.trc.clayium.api.util.getAsItem
+import com.github.trc.clayium.client.renderer.MetalChestItemRenderer
 import com.github.trc.clayium.common.blocks.chunkloader.ChunkLoaderBlock
 import com.github.trc.clayium.common.blocks.claycraftingtable.BlockClayCraftingBoard
 import com.github.trc.clayium.common.blocks.claytree.BlockClayLeaves
@@ -21,6 +22,7 @@ import com.github.trc.clayium.common.blocks.marker.BlockClayMarker
 import com.github.trc.clayium.common.blocks.material.BlockCompressed
 import com.github.trc.clayium.common.blocks.material.BlockCompressedClay
 import com.github.trc.clayium.common.blocks.material.BlockEnergizedClay
+import com.github.trc.clayium.common.blocks.metalchest.BlockMetalChest
 import com.github.trc.clayium.common.blocks.ores.BlockClayOre
 import com.github.trc.clayium.common.blocks.ores.BlockDenseClayOre
 import com.github.trc.clayium.common.creativetab.ClayiumCTabs
@@ -84,10 +86,12 @@ object ClayiumBlocks {
     val COMPRESSED_CLAY_BLOCKS = mutableListOf<BlockCompressedClay>()
     val ENERGIZED_CLAY_BLOCKS = mutableListOf<BlockEnergizedClay>()
     val COMPRESSED_BLOCKS = mutableListOf<BlockCompressed>()
+    val METAL_CHEST = createBlock("metal_chest", BlockMetalChest())
 
     private val compressedClay = mutableMapOf<CMaterial, BlockCompressedClay>()
     private val energizedClay = mutableMapOf<CMaterial, BlockEnergizedClay>()
     private val compressedBlocks = mutableMapOf<CMaterial, BlockCompressed>()
+    private val metalChests = mutableMapOf<CMaterial, BlockMetalChest>()
 
     /* ---------------------------------- */
 
@@ -143,7 +147,6 @@ object ClayiumBlocks {
             registry.register(ib)
             COMPRESSED_ITEM_BLOCKS.add(ib)
         }
-
         registry.register(createItemBlock(COLORED_SILICONE, ::VariantItemBlock))
     }
 
@@ -179,7 +182,7 @@ object ClayiumBlocks {
     }
 
     fun createEnergizedClayBlock(metaMaterialMap: Map<Int, CMaterial>, index: Int) {
-        val block = BlockEnergizedClay.Companion.create(metaMaterialMap)
+        val block = BlockEnergizedClay.create(metaMaterialMap)
         block.registryName = clayiumId("energized_clay_$index")
         ENERGIZED_CLAY_BLOCKS.add(block)
         metaMaterialMap.values.forEach { energizedClay[it] = block }
@@ -204,6 +207,7 @@ object ClayiumBlocks {
         setStateMapper(CLAY_TREE_LEAVES, StateMap.Builder().ignore(BlockLeaves.CHECK_DECAY, BlockLeaves.DECAYABLE).build())
         setStateMapper(CLAY_TREE_SAPLING, StateMap.Builder().ignore(BlockSapling.STAGE).build())
         setStateMapper(COLORED_SILICONE, StateMap.Builder().ignore(COLORED_SILICONE.variantProperty).build())
+        setStateMapper(LASER_REFLECTOR, StateMap.Builder().ignore(BlockClayLaserReflector.FACING).build())
     }
 
     @SideOnly(Side.CLIENT)
@@ -215,9 +219,12 @@ object ClayiumBlocks {
     @SideOnly(Side.CLIENT)
     fun registerModels() {
         blocks.values.forEach(::registerItemModel)
+        METAL_CHEST.getAsItem().tileEntityItemStackRenderer = MetalChestItemRenderer
+
         for (block in ENERGIZED_CLAY_BLOCKS) block.registerModels()
         for (block in COMPRESSED_CLAY_BLOCKS) block.registerModels()
         for (block in COMPRESSED_BLOCKS) block.registerModels()
+        METAL_CHEST.registerModels()
 
         stateMapperCache.clear()
     }
@@ -227,8 +234,9 @@ object ClayiumBlocks {
         val item = block.getAsItem()
         val defaultStateMapper = DefaultStateMapper()
         when (block) {
-            CLAY_TREE_SAPLING -> ModelLoader.setCustomModelResourceLocation(item, 0, ModelResourceLocation(clayiumId("clay_tree_sapling"), "inventory"))
-            PAN_CABLE -> ModelLoader.setCustomModelResourceLocation(item, 0, ModelResourceLocation(clayiumId("pan_cable"), "inventory"))
+            CLAY_TREE_SAPLING, PAN_CABLE, LASER_REFLECTOR -> {
+                ModelLoader.setCustomModelResourceLocation(item, 0, ModelResourceLocation(block.registryName!!, "inventory"))
+            }
             else -> {
                 val customStateMapper = stateMapperCache[block]
                 if (customStateMapper != null) {
