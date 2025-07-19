@@ -49,6 +49,8 @@ class BlockMetalChest : Block(BlockMaterial.IRON) {
     init {
         setCreativeTab(ClayiumCTabs.main)
         setSoundType(SoundType.METAL)
+        setHardness(2.0f)
+        setResistance(2.0f)
     }
 
     override fun createBlockState(): BlockStateContainer {
@@ -125,6 +127,44 @@ class BlockMetalChest : Block(BlockMaterial.IRON) {
         return worldIn.getTileEntity(pos)?.receiveClientEvent(id, param) ?: super.eventReceived(state, worldIn, pos, id, param)
     }
 
+    private val beingBrokenMeta = ThreadLocal<Int>()
+
+    override fun breakBlock(worldIn: World, pos: BlockPos, state: IBlockState) {
+        val te = worldIn.getTileEntity(pos) as? TileEntityMetalChest
+        if (te != null) {
+            for (stack in te.itemDroppedOnDestroy()) {
+                spawnAsEntity(worldIn, pos, stack)
+            }
+            beingBrokenMeta.set(te.material.metaItemSubId)
+        }
+        super.breakBlock(worldIn, pos, state)
+    }
+
+    override fun harvestBlock(worldIn: World, player: EntityPlayer, pos: BlockPos, state: IBlockState, te: TileEntity?, stack: ItemStack) {
+        if (te as? TileEntityMetalChest != null) beingBrokenMeta.set(te.material.metaItemSubId)
+        super.harvestBlock(worldIn, player, pos, state, te, stack)
+        beingBrokenMeta.remove()
+    }
+
+    override fun getDrops(drops: NonNullList<ItemStack?>, world: IBlockAccess, pos: BlockPos, state: IBlockState, fortune: Int) {
+        val te = world.getTileEntity(pos) as? TileEntityMetalChest
+        if (te != null) {
+            drops.add(ItemStack(this, 1, te.material.metaItemSubId))
+        } else {
+            val meta = beingBrokenMeta.get() ?: 0 // Use default value if beingBrokenMeta.get() is null
+            drops.add(ItemStack(this, 1, meta))
+        }
+    }
+
+    override fun getPickBlock(state: IBlockState, target: RayTraceResult, world: World, pos: BlockPos, player: EntityPlayer): ItemStack {
+        val te = world.getTileEntity(pos) as? TileEntityMetalChest
+        return if (te != null) {
+            ItemStack(this, 1, te.material.metaItemSubId)
+        } else {
+            ItemStack(this, 1, 0)
+        }
+    }
+
     @SideOnly(Side.CLIENT)
     override fun getRenderType(state: IBlockState) = EnumBlockRenderType.ENTITYBLOCK_ANIMATED
 
@@ -134,6 +174,10 @@ class BlockMetalChest : Block(BlockMaterial.IRON) {
         for (material in ClayiumApi.materialRegistry) {
             ModelLoader.setCustomModelResourceLocation(this.getAsItem(), material.metaItemSubId, itemLoc)
         }
+    }
+
+    override fun hasCustomBreakingProgress(state: IBlockState): Boolean {
+        return true
     }
 
     /* BoilerPlate for custom particle handling */

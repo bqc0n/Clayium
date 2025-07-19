@@ -81,6 +81,15 @@ class TileEntityMetalChest : SyncedTileEntityBase(), ITickable, IGuiHolder<PosGu
         if (!this.world.isRemote) this.markDirty()
     }
 
+    fun itemDroppedOnDestroy(): List<ItemStack> {
+        val stacks = mutableListOf<ItemStack>()
+        for (i in 0..<this.itemInventory.slots) {
+            val stack = this.itemInventory.extractItem(i, Int.MAX_VALUE, false)
+            if (!stack.isEmpty) { stacks.add(stack) }
+        }
+        return stacks
+    }
+
     override fun update() {
         this.prevLidAngle = this.lidAngle
         val open = this.numPlayersUsing > 0 && this.lidAngle == 0.0f
@@ -221,7 +230,8 @@ class TileEntityMetalChest : SyncedTileEntityBase(), ITickable, IGuiHolder<PosGu
             )
         }
 
-        val width = max(max(inventoryWidth, 9) * 18 + 14, GUI_DEFAULT_WIDTH + 56)
+        val paddingForPageButtons = if (inventoryPage > 1) 56 else 0
+        val width = max(max(inventoryWidth, 9) * 18 + 14, GUI_DEFAULT_WIDTH + paddingForPageButtons)
         val chestInventoryWidth = inventoryWidth * 18
         val playerInventoryWidth = 162
         val titleTextWidget = if (this.customName != null) {
