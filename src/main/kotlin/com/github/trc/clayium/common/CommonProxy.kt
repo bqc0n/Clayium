@@ -25,6 +25,7 @@ import com.github.trc.clayium.common.blocks.marker.TileClayMarker
 import com.github.trc.clayium.common.blocks.metalchest.BlockMetalChest
 import com.github.trc.clayium.common.blocks.metalchest.TileEntityMetalChest
 import com.github.trc.clayium.common.creativetab.ClayiumCTabs
+import com.github.trc.clayium.common.event.EntityEventListener
 import com.github.trc.clayium.common.items.ClayiumItems
 import com.github.trc.clayium.common.items.ItemClaySteelTool
 import com.github.trc.clayium.common.loaders.OreDictionaryLoader
@@ -62,6 +63,7 @@ open class CommonProxy {
     open fun preInit(event: FMLPreInitializationEvent) {
         MinecraftForge.EVENT_BUS.register(ClayiumMod.proxy)
         MinecraftForge.EVENT_BUS.register(ItemClaySteelTool)
+        MinecraftForge.EVENT_BUS.register(EntityEventListener)
         if (CUtils.isDeobfEnvironment) { MinecraftForge.EVENT_BUS.register(DebugUtils::class.java) }
 
         ClayiumCTabs.init()
@@ -165,4 +167,7 @@ open class CommonProxy {
 
         GameRegistry.registerTileEntity(TileEntityMetalChest::class.java, clayiumId("metalChest"))
     }
+
+    open fun updateFlightStatus(mode: Int) {}
+    open fun overclockPlayer(delay: Int) {}
 }

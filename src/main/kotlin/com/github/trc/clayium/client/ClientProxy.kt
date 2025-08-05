@@ -21,6 +21,7 @@ import com.github.trc.clayium.common.util.KeyInput
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.block.model.ModelResourceLocation
 import net.minecraft.item.Item
+import net.minecraft.util.math.MathHelper
 import net.minecraftforge.client.event.ColorHandlerEvent
 import net.minecraftforge.client.event.ModelRegistryEvent
 import net.minecraftforge.client.event.TextureStitchEvent
@@ -34,6 +35,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
 import net.minecraftforge.registries.IForgeRegistry
+
+private const val mode1velocity: Float = 0.7f
+private const val mode2acceleration: Float = 0.9f
+private const val mode2division: Float = 1.1f
 
 @Suppress("unused")
 @SideOnly(Side.CLIENT)
@@ -103,5 +108,59 @@ class ClientProxy : CommonProxy() {
     fun registerItemColors(e: ColorHandlerEvent.Item) {
         ClayiumBlocks.registerItemColors(e)
         MetaItemClayium.registerColors(e)
+    }
+
+    override fun updateFlightStatus(mode: Int) {
+        val mc = Minecraft.getMinecraft()
+        val player = mc.player
+            ?: return
+        if (!(mode > 0 && player.capabilities.isFlying)) return
+
+        val mi = player.movementInput
+        val settings = mc.gameSettings
+        val supersonic = mode >= 2
+
+        val yawRad = Math.toRadians(player.rotationYaw.toDouble()).toFloat()
+        val sinYaw = MathHelper.sin(yawRad)
+        val cosYaw = MathHelper.cos(yawRad)
+
+        mi.moveForward = (player.motionZ * cosYaw - player.motionX * sinYaw).toFloat()
+        mi.moveStrafe = (player.motionZ * sinYaw + player.motionX * cosYaw).toFloat()
+
+        val verticalDir = (if (mi.jump) 1 else 0) - (if (mi.sneak) 1 else 0)
+        player.motionY = when {
+            verticalDir == 0 -> 0.0
+            supersonic -> (player.motionY + verticalDir * mode2acceleration) / mode2division
+            else -> (verticalDir * mode1velocity).toDouble()
+        }
+
+        val forwardDir = (if (settings.keyBindForward.isKeyDown) 1 else 0) - (if (settings.keyBindBack.isKeyDown) 1 else 0)
+        val strafeDir = (if (settings.keyBindLeft.isKeyDown) 1 else 0) - (if (settings.keyBindRight.isKeyDown) 1 else 0)
+
+        mi.moveForward = when {
+            forwardDir == 0 -> 0f
+            supersonic -> (mi.moveForward + forwardDir * mode2acceleration) / mode2division
+            else -> forwardDir * mode1velocity
+        }
+
+        mi.moveStrafe = when {
+            strafeDir == 0 -> 0f
+            supersonic -> (mi.moveStrafe + strafeDir * mode2acceleration) / mode2division
+            else -> strafeDir * mode1velocity
+        }
+
+        player.motionX = (mi.moveStrafe * cosYaw - mi.moveForward * sinYaw).toDouble()
+        player.motionZ = (mi.moveForward * cosYaw + mi.moveStrafe * sinYaw).toDouble()
+    }
+
+    override fun overclockPlayer(delay: Int) {
+        val mc = Minecraft.getMinecraft()
+        if (mc.playerController.blockHitDelay > delay) {
+            mc.playerController.blockHitDelay = delay
+        }
+
+        if (mc.rightClickDelayTimer > delay + 1) {
+            mc.rightClickDelayTimer = delay + 1
+        }
     }
 }
