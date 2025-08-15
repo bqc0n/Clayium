@@ -1,12 +1,13 @@
 package io.github.trcdevelopers.clayium.common.blocks.claycraftingtable
 
-import com.cleanroommc.modularui.factory.TileEntityGuiFactory
 import io.github.trcdevelopers.clayium.api.block.ITieredBlock
 import io.github.trcdevelopers.clayium.api.util.ClayTiers
+import io.github.trcdevelopers.clayium.api.util.toList
+import io.github.trcdevelopers.clayium.common.ClayiumMod
+import io.github.trcdevelopers.clayium.common.GuiHandler
 import net.minecraft.block.Block
 import net.minecraft.block.material.Material
 import net.minecraft.block.state.IBlockState
-import net.minecraft.client.util.ITooltipFlag
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.util.EnumFacing
@@ -25,13 +26,13 @@ class BlockClayCraftingBoard : Block(Material.CLAY), ITieredBlock {
 
     private val aabb = AxisAlignedBB(0.0, 0.0, 0.0, 1.0, 0.25, 1.0)
     override fun hasTileEntity(state: IBlockState) = true
-    override fun createTileEntity(world: World, state: IBlockState) = TileClayCraftingTable()
+    override fun createTileEntity(world: World, state: IBlockState) = TileClayCraftingBoard()
     override fun getTier(stack: ItemStack) = ClayTiers.DEFAULT
     override fun getTier(world: IBlockAccess, pos: BlockPos) = ClayTiers.DEFAULT
 
     override fun onBlockActivated(worldIn: World, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean {
         if (!worldIn.isRemote) {
-            TileEntityGuiFactory.INSTANCE.open(playerIn, pos)
+            playerIn.openGui(ClayiumMod, GuiHandler.CLAY_CRAFTING_BOARD, worldIn, pos.x, pos.y, pos.z)
         }
         return true
     }
@@ -43,7 +44,13 @@ class BlockClayCraftingBoard : Block(Material.CLAY), ITieredBlock {
 
     override fun getBoundingBox(state: IBlockState, source: IBlockAccess, pos: BlockPos) = aabb
 
-    override fun addInformation(stack: ItemStack, worldIn: World?, tooltip: MutableList<String>, flagIn: ITooltipFlag) {
-        tooltip.add("WIP, not functional yet")
+    override fun breakBlock(worldIn: World, pos: BlockPos, state: IBlockState) {
+        val tileEntity = worldIn.getTileEntity(pos) as? TileClayCraftingBoard
+            ?: return
+        tileEntity.inventory.toList().forEach {
+            if (!it.isEmpty) {
+                spawnAsEntity(worldIn, pos, it)
+            }
+        }
     }
 }

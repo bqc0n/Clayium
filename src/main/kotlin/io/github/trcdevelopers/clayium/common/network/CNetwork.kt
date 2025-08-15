@@ -12,5 +12,6 @@ object CNetwork {
     fun init() {
         var id = 0
         channel.registerMessage(KeyInputPacketHandler, KeyInputPacket::class.java, id++, Side.SERVER)
+        channel.registerMessage(LastRecipePacket, LastRecipePacket::class.java, id++, Side.CLIENT)
     }
 }

@@ -19,7 +19,7 @@ import io.github.trcdevelopers.clayium.common.blocks.ClayiumBlocks
 import io.github.trcdevelopers.clayium.common.blocks.TileEntityClayLaserReflector
 import io.github.trcdevelopers.clayium.common.blocks.TileEntityCreativeEnergySource
 import io.github.trcdevelopers.clayium.common.blocks.chunkloader.ChunkLoaderTileEntity
-import io.github.trcdevelopers.clayium.common.blocks.claycraftingtable.TileClayCraftingTable
+import io.github.trcdevelopers.clayium.common.blocks.claycraftingtable.TileClayCraftingBoard
 import io.github.trcdevelopers.clayium.common.blocks.clayworktable.TileClayWorkTable
 import io.github.trcdevelopers.clayium.common.blocks.marker.TileClayMarker
 import io.github.trcdevelopers.clayium.common.blocks.metalchest.BlockMetalChest
@@ -44,7 +44,6 @@ import io.github.trcdevelopers.clayium.integration.gregtech.GTOreDictUnifierAdap
 import io.github.trcdevelopers.clayium.network.ClayChunkLoaderCallback
 import net.minecraft.block.Block
 import net.minecraft.item.Item
-import net.minecraft.item.ItemBlock
 import net.minecraft.item.crafting.IRecipe
 import net.minecraftforge.common.ForgeChunkManager
 import net.minecraftforge.common.MinecraftForge
@@ -144,19 +143,14 @@ open class CommonProxy {
         registry.register(item)
     }
 
-    private fun <T: Block> createItemBlock(block: T, producer: (T) -> ItemBlock): ItemBlock {
-        return producer(block).apply {
-            registryName = block.registryName ?: throw IllegalArgumentException("Block ${block.translationKey} has no registry name")
-        }
-    }
-
     fun registerTileEntities() {
+        // TODO: lower snake case is appropriate for ResourceLocation?
         GameRegistry.registerTileEntity(TileClayWorkTable::class.java, clayiumId("clayWorkTable"))
         GameRegistry.registerTileEntity(TileEntityClayLaserReflector::class.java, clayiumId("laser_reflector"))
         GameRegistry.registerTileEntity(TileEntityCreativeEnergySource::class.java, clayiumId("creativeEnergySource"))
         GameRegistry.registerTileEntity(MetaTileEntityHolder::class.java, clayiumId("metaTileEntityHolder"))
         GameRegistry.registerTileEntity(BlockQuartzCrucible.QuartzCrucibleTileEntity::class.java, clayiumId("quartzCrucibleTileEntity"))
-        GameRegistry.registerTileEntity(TileClayCraftingTable::class.java, clayiumId("clayCraftingTable"))
+        GameRegistry.registerTileEntity(TileClayCraftingBoard::class.java, clayiumId("clay_crafting_board"))
 
         GameRegistry.registerTileEntity(TileClayMarker.NoExtend::class.java, clayiumId("clayMarkerNoExtent"))
         GameRegistry.registerTileEntity(TileClayMarker.ExtendToGround::class.java, clayiumId("clayMarkerExtendToGround"))
