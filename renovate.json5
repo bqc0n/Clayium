@@ -12,7 +12,7 @@
       enabled: false,
     },
     {
-      matchFileNames: ["dependencies.gradle"],
+      matchCategories: ["java"],
       enabled: true,
       groupName: "Gradle Dependencies"
     },
@@ -26,5 +26,10 @@
       enabled: true,
       groupName: "NPM Dependencies"
     },
+    {
+      matchFileNames: ["**/dependencies.gradle"],
+      enabled: true,
+      groupName: "Mod Dependencies"
+    }
   ]
 }
