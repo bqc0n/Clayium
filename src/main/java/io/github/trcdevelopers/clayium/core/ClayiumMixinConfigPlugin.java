@@ -1,4 +1,4 @@
-package io.github.trcdevelopers.clayium.mixins;
+package io.github.trcdevelopers.clayium.core;
 
 import io.github.trcdevelopers.clayium.api.util.CUtils;
 import org.objectweb.asm.tree.ClassNode;
@@ -11,9 +11,7 @@ import java.util.Set;
 
 public class ClayiumMixinConfigPlugin implements IMixinConfigPlugin {
     @Override
-    public void onLoad(String mixinPackage) {
-
-    }
+    public void onLoad(String mixinPackage) {}
 
     @Override
     public String getRefMapperConfig() {
@@ -22,14 +20,15 @@ public class ClayiumMixinConfigPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        // Mixin Narrator is enabled only in deobf environment
-        return CUtils.INSTANCE.isDeobfEnvironment() || !mixinClassName.endsWith("MixinNarrator");
+        //noinspection RedundantIfStatement | I think it is easier to understand
+        if (targetClassName.endsWith("Narrator") && !CUtils.INSTANCE.isDeobfEnvironment()) {
+            return false;
+        }
+        return true;
     }
 
     @Override
-    public void acceptTargets(Set<String> myTargets, Set<String> otherTargets) {
-
-    }
+    public void acceptTargets(Set<String> myTargets, Set<String> otherTargets) {}
 
     @Override
     public List<String> getMixins() {
@@ -37,12 +36,8 @@ public class ClayiumMixinConfigPlugin implements IMixinConfigPlugin {
     }
 
     @Override
-    public void preApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
-
-    }
+    public void preApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {}
 
     @Override
-    public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
-
-    }
+    public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {}
 }

@@ -1,4 +1,4 @@
-package io.github.trcdevelopers.clayium.mixins;
+package io.github.trcdevelopers.clayium.core;
 
 import zone.rong.mixinbooter.ILateMixinLoader;
 

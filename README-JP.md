@@ -29,7 +29,6 @@ Clayiumの1.12.2向け**非公式**移植版です。
 
 - 粘土銃
 - 一部コンフィグ (`ProgressionRate`など)
-- 他MODとの連携要素
 
 ## ライセンス
 ### Code
@@ -44,13 +43,17 @@ Clayium © deb_rk (Licensed under [CC-BY-4.0](https://creativecommons.org/licens
 
 Clayium Unofficialは以下のOSSを利用、または参照しています。
 
-|                                   Name                                   |                                      License                                      |
-|:------------------------------------------------------------------------:|:---------------------------------------------------------------------------------:|
-|     [Clayium](https://www.curseforge.com/minecraft/mc-mods/clayium)      |             [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/)             |
-|     [CodeChickenLib](https://github.com/TheCBProject/CodeChickenLib)     |  [LGPL-2.1](https://github.com/TheCBProject/CodeChickenLib/blob/master/LICENSE)   |
-| [Forgelin Continuous](https://github.com/ChAoSUnItY/Forgelin-Continuous) | [LGPL-3.0](https://github.com/ChAoSUnItY/Forgelin-Continuous/blob/master/LICENSE) |
-|    [GTCEu Buildscripts](https://github.com/GregTechCEu/Buildscripts)     |      [MIT](https://github.com/GregTechCEu/Buildscripts/blob/master/LICENSE)       |
-|     [GTExpert-Core](https://github.com/GTModpackTeam/GTExpert-Core)      |  [LGPL-3.0](https://github.com/GTModpackTeam/GTExpert-Core/blob/master/LICENSE)   |
-|          [GregTechCEu](https://github.com/GregTechCEu/GregTech)          |      [LGPL-3.0](https://github.com/GregTechCEu/GregTech/blob/master/LICENSE)      |
-|          [ModularUI](https://github.com/CleanroomMC/ModularUI)           |     [LGPL-3.0](https://github.com/CleanroomMC/ModularUI/blob/master/LICENSE)      |
-|        [RFTools](https://github.com/McJtyMods/RFTools/tree/1.12)         |         [MIT](https://github.com/McJtyMods/RFTools/blob/1.12/LICENSE.md)          |
+|                                      Name                                       |                                         License                                         |
+|:-------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------:|
+|         [Clayium](https://www.curseforge.com/minecraft/mc-mods/clayium)         |                [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/)                |
+|        [CodeChickenLib](https://github.com/TheCBProject/CodeChickenLib)         |     [LGPL-2.1](https://github.com/TheCBProject/CodeChickenLib/blob/master/LICENSE)      |
+|    [Forgelin Continuous](https://github.com/ChAoSUnItY/Forgelin-Continuous)     |    [LGPL-3.0](https://github.com/ChAoSUnItY/Forgelin-Continuous/blob/master/LICENSE)    |
+|             [GregTechCEu](https://github.com/GregTechCEu/GregTech)              |         [LGPL-3.0](https://github.com/GregTechCEu/GregTech/blob/master/LICENSE)         |
+|        [GTCEu Buildscripts](https://github.com/GregTechCEu/Buildscripts)        |         [MIT](https://github.com/GregTechCEu/Buildscripts/blob/master/LICENSE)          |
+|                   [EnderIO](https://modrinth.com/mod/enderio)                   | [The Unlicense](https://github.com/SleepyTrousers/EnderIO-1.5-1.12/blob/master/LICENSE) |
+|          [ExtremeReactors](https://modrinth.com/mod/extreme-reactors)           |                    [MIT](https://modrinth.com/mod/extreme-reactors)                     |
+| [TofuCraftReload](https://www.curseforge.com/minecraft/mc-mods/tofucraftreload) |       [MIT](https://www.curseforge.com/minecraft/mc-mods/tofucraftreload#license)       |
+|                  [Sakura](https://modrinth.com/mod/sakura_mod)                  |                       [MIT](https://modrinth.com/mod/sakura_mod)                        |
+|         [GTExpert-Core](https://github.com/GTModpackTeam/GTExpert-Core)         |     [LGPL-3.0](https://github.com/GTModpackTeam/GTExpert-Core/blob/master/LICENSE)      |
+|              [ModularUI](https://github.com/CleanroomMC/ModularUI)              |        [LGPL-3.0](https://github.com/CleanroomMC/ModularUI/blob/master/LICENSE)         |
+|            [RFTools](https://github.com/McJtyMods/RFTools/tree/1.12)            |            [MIT](https://github.com/McJtyMods/RFTools/blob/1.12/LICENSE.md)             |

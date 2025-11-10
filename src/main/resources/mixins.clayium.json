@@ -4,9 +4,8 @@
   "target": "@env(DEFAULT)",
   "minVersion": "0.8",
   "compatibilityLevel": "JAVA_8",
-  "plugin": "io.github.trcdevelopers.clayium.mixins.ClayiumMixinConfigPlugin",
+  "plugin": "io.github.trcdevelopers.clayium.core.ClayiumMixinConfigPlugin",
   "mixins": [
-    "patch.MixinNarrator"
   ],
   "client": [],
   "server": []
