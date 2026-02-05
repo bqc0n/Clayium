@@ -37,7 +37,7 @@
     {
       // renovate updates Sakura MOD to a different MC Version which breaks the build
       matchManagers: ["gradle"],
-      matchPackageNames: ["maven.modrinth:sakura_mod"],
+      matchPackageNames: ["maven.modrinth:sakura_mod", "maven.modrinth:mmlib"],
       enabled: false
     }
   ]
