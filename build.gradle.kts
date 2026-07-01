@@ -23,7 +23,7 @@ plugins {
     id("maven-publish")
     id("org.jetbrains.gradle.plugin.idea-ext") version "1.3"
     id("eclipse")
-    id("com.gtnewhorizons.retrofuturagradle") version "1.4.9"
+    id("com.gtnewhorizons.retrofuturagradle") version "2.0.2"
 }
 
 val forgelinContinuousVersion: String by project
@@ -150,7 +150,7 @@ dependencies {
         isTransitive = false
     }
     annotationProcessor("org.ow2.asm:asm-debug-all:5.2")
-    annotationProcessor("com.google.guava:guava:32.1.3-jre")
+    annotationProcessor("com.google.guava:guava:33.6.0-jre")
     annotationProcessor("com.google.code.gson:gson:2.13.2")
     annotationProcessor(mixin) {
         isTransitive = false
